@@ -19,6 +19,7 @@ RUN set -ex; \
 		libfreetype6-dev \
 		libjpeg-dev \
 		libmagickwand-dev \
+		libonig-dev \
 		libpng-dev \
 		libzip-dev \
 	; \
@@ -29,11 +30,13 @@ RUN set -ex; \
 		exif \
 		gd \
 		mysqli \
+		mbstring \
+		pdo_mysql \
 		opcache \
 		zip \
 	; \
 	pecl install imagick-3.4.4; \
-	docker-php-ext-enable imagick; \
+	docker-php-ext-enable imagick pdo_mysql; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
