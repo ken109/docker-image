@@ -10,7 +10,6 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
-# install the PHP extensions we need (https://make.wordpress.org/hosting/handbook/handbook/server-environment/#php-extensions)
 RUN set -ex; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -59,10 +58,8 @@ RUN { \
 		echo 'opcache.revalidate_freq=2'; \
 		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-# https://wordpress.org/support/article/editing-wp-config-php/#configure-error-logging
 RUN { \
 # https://www.php.net/manual/en/errorfunc.constants.php
-# https://github.com/docker-library/wordpress/issues/420#issuecomment-517839670
 		echo 'error_reporting = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING | E_RECOVERABLE_ERROR'; \
 		echo 'display_errors = Off'; \
 		echo 'display_startup_errors = Off'; \
@@ -89,7 +86,6 @@ RUN set -eux; \
 		echo 'RemoteIPTrustedProxy 127.0.0.0/8'; \
 	} > /etc/apache2/conf-available/remoteip.conf; \
 	a2enconf remoteip; \
-# https://github.com/docker-library/wordpress/issues/383#issuecomment-507886512
 # (replace all instances of "%h" with "%a" in LogFormat)
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 
