@@ -67,11 +67,16 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 		tar "${sourceTarArgs[@]}" . | tar "${targetTarArgs[@]}"
 		echo >&2 "Complete! Laravel has been successfully copied to $PWD"
+	elif [ ! -d vendor ]; then
+    echo >&2 "Vendor not found in $PWD - installing now..."
+		composer install
 	fi
 
 	# allow any of these "Authentication Unique Keys and Salts." to be specified via
 	# environment variables with a "LARAVEL_" prefix (ie, "LARAVEL_AUTH_KEY")
 	envs=(
+		LARAVEL_NAME
+		LARAVEL_ENV
 		LARAVEL_DB_HOST
 		LARAVEL_DB_USER
 		LARAVEL_DB_PASSWORD
@@ -100,6 +105,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
 	# only touch ".env" if we have environment-supplied configuration values
 	if [ "$haveConfig" ]; then
+		: "${LARAVEL_NAME:=Laravel}"
+		: "${LARAVEL_ENV:=local}"
 		: "${LARAVEL_DB_HOST:=mysql}"
 		: "${LARAVEL_DB_USER:=root}"
 		: "${LARAVEL_DB_PASSWORD:=}"
@@ -114,6 +121,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			sed -ri -e "s/$1.*/$1=$2/" .env
 		}
 
+		set_config 'APP_NAME' "$LARAVEL_NAME"
+		set_config 'APP_ENV' "$LARAVEL_ENV"
 		set_config 'DB_HOST' "$LARAVEL_DB_HOST"
 		set_config 'DB_DATABASE' "$LARAVEL_DB_NAME"
 		set_config 'DB_USERNAME' "$LARAVEL_DB_USER"
