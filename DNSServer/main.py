@@ -1,18 +1,23 @@
+import sys
 from twisted.internet import reactor, defer
 from twisted.names import client, dns, error, server
+from twisted.python import log
+from twisted.logger import Logger
 import re
 
 
 class DynamicResolver(object):
+    log = Logger()
+
     def _dynamicResponseRequired(self, query):
         name = query.name.name.decode()
         if query.type == dns.A:
             if re.search(r'^[^.]*$', name) or re.search(r'\.localhost$', name):
-                print(f'Localhost address: {name}')
+                self.log.debug(f'Localhost address: {name}')
                 return True
-            print(f'Other host address: {name}')
+            self.log.debug(f'Other host address: {name}')
         else:
-            print(f'Non type A address: {name}')
+            self.log.debug(f'Non type A address: {name}')
         return False
 
     def _doDynamicResponse(self, query):
@@ -33,6 +38,8 @@ class DynamicResolver(object):
 
 
 def main():
+    log.startLogging(sys.stdout)
+
     factory = server.DNSServerFactory(
         clients=[DynamicResolver(), client.Resolver(servers=[('8.8.8.8', 53), ('8.8.4.4', 53)])]
     )
