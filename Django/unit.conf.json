@@ -1,0 +1,16 @@
+{
+  "listeners": {
+    "*:80": {
+      "application": "APP_NAME"
+    }
+  },
+  "applications": {
+    "APP_NAME": {
+      "type": "python 3.7",
+      "processes": 5,
+      "path": "/var/www/django/",
+      "home": "/opt/conda/",
+      "module": "APP_NAME.wsgi"
+    }
+  }
+}
