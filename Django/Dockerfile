@@ -12,6 +12,7 @@ RUN conda config --append channels conda-forge; \
         libiconv; \
     conda clean --all; \
     pip install pyinotify; \
+    rm -rf /root/.cache/pip; \
     rm -rf /usr/share/nginx/html/*
 
 WORKDIR /usr/share/nginx/html
