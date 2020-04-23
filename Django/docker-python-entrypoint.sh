@@ -1,5 +1,5 @@
 #!/bin/bash
-set -meuo pipefail
+set -euo pipefail
 
 file_env() {
 	local var="$1"
@@ -19,11 +19,28 @@ file_env() {
 	unset "$fileVar"
 }
 
+if [ -v CONDA_MODULE ]; then
+  if [ -n "$CONDA_MODULE" ]; then
+    conda install -y "$CONDA_MODULE"
+  fi
+else
+  echo >&2 "error: please set environment: CONDA_MODULE"
+  exit 1
+fi
+if [ -v PIP_MODULE ]; then
+  if [ -n "$PIP_MODULE" ]; then
+    pip install "$PIP_MODULE"
+  fi
+else
+  echo >&2 "error: please set environment: PIP_MODULE"
+  exit 1
+fi
+
 if [ ! -e manage.py ]; then
   cd ../
   django-admin startproject "$DJANGO_NAME"
-  mv "$DJANGO_NAME"/* django/
-  cd django
+  mv "$DJANGO_NAME"/* html/
+  cd html
 fi
 
 envs=(
@@ -61,11 +78,9 @@ if [ "$haveConfig" ]; then
   : "${DJANGO_DB_PASSWORD:=}"
   : "${DJANGO_DB_NAME:=django}"
 
-  cp /usr/src/settings.py "$DJANGO_NAME/settings.py"
-
   set_config() {
-    sed -ri -e "s/$1/$2/" "$DJANGO_NAME/settings.py"
-    sed -ri -e "s/$1/$2/" /usr/src/unit.conf.json
+    sed -ri -e "s/$1/$2/" /usr/src/settings.py
+    sed -ri -e "s/$1/$2/" /usr/src/uwsgi.ini
   }
 
   set_config 'APP_NAME' "$DJANGO_NAME"
@@ -73,15 +88,27 @@ if [ "$haveConfig" ]; then
   set_config 'DB_DATABASE' "$DJANGO_DB_NAME"
   set_config 'DB_USERNAME' "$DJANGO_DB_USER"
   set_config 'DB_PASSWORD' "$DJANGO_DB_PASSWORD"
+
+  if [ -v INSTALLED_APPS ]; then
+    if [ -n "$INSTALLED_APPS" ]; then
+      for app in $INSTALLED_APPS; do
+        sed -ri -e "/INSTALLED_APPS/,/MIDDLEWARE/ s/]/'$app',\n]/" /usr/src/settings.py
+      done
+    fi
+  else
+    echo >&2 "error: please set environment: INSTALLED_APPS"
+    exit 1
+  fi
+
+  cp /usr/src/settings.py "$DJANGO_NAME/settings.py"
 fi
 
-# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
 for e in "${envs[@]}"; do
   unset "$e"
 done
 
 python manage.py collectstatic --noinput
 
-unitd --no-daemon --control unix:/var/run/control.unit.sock &
-curl -X PUT -d@/usr/src/unit.conf.json --unix-socket /var/run/control.unit.sock http://localhost/config/
-fg 1
+uwsgi --ini /usr/src/uwsgi.ini
+
+exec "$@"
