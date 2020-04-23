@@ -11,12 +11,15 @@ RUN conda config --append channels conda-forge; \
         uwsgi \
         libiconv; \
     conda clean --all; \
+    pip install pyinotify; \
     rm -rf /usr/share/nginx/html/*
 
 WORKDIR /usr/share/nginx/html
 
-COPY settings.py /usr/src/
-COPY uwsgi.ini /usr/src/
+COPY settings.py /usr/src
+COPY uwsgi.ini /usr/src
+COPY watcher.ini /usr/src
+COPY watcher.py /usr/local/bin
 COPY default.conf /etc/nginx/conf.d
 
 COPY docker-python-entrypoint.sh /usr/local/bin

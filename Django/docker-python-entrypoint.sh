@@ -108,7 +108,7 @@ for e in "${envs[@]}"; do
 done
 
 python manage.py collectstatic --noinput
-
 uwsgi --ini /usr/src/uwsgi.ini
+watcher.py -c /usr/src/watcher.ini start
 
 exec "$@"
