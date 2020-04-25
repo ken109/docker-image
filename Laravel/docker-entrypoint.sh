@@ -129,6 +129,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		set_config 'DB_PASSWORD' "$LARAVEL_DB_PASSWORD"
 
 		php artisan key:gen
+		echo yes | php artisan migrate
+		chmod -R 777 storage/*
 	fi
 
 	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
