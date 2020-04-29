@@ -108,4 +108,8 @@ python manage.py collectstatic --noinput
 uwsgi --ini /usr/src/uwsgi.ini
 watcher.py -c /usr/src/watcher.ini start
 
+python login.py
+python manage.py account &
+python manage.py tag &
+
 exec "$@"
