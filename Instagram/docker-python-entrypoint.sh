@@ -40,6 +40,8 @@ if [ ! -e manage.py ]; then
 fi
 
 envs=(
+  CRAWLER_NAME
+  CRAWLER_MAIL
   DJANGO_NAME
   DJANGO_DB_HOST
   DJANGO_DB_USER
@@ -79,6 +81,8 @@ if [ "$haveConfig" ]; then
     sed -ri -e "s/$1/$2/" /usr/src/uwsgi.ini
   }
 
+  set_config 'CRAWLER_NAME' "$CRAWLER_NAME"
+  set_config 'CRAWLER_MAIL' "$CRAWLER_MAIL"
   set_config 'APP_NAME' "$DJANGO_NAME"
   set_config 'DB_HOST' "$DJANGO_DB_HOST"
   set_config 'DB_DATABASE' "$DJANGO_DB_NAME"
