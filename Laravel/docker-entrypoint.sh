@@ -118,7 +118,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 		fi
 
 		set_config() {
-			sed -ri -e "s/$1.*/$1=$2/" .env
+			sed -ri -e "s/^$1.*/$1=$2/" .env
 		}
 
 		set_config 'APP_NAME' "$LARAVEL_NAME"
