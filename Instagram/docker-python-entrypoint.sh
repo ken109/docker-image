@@ -109,7 +109,7 @@ uwsgi --ini /usr/src/uwsgi.ini
 watcher.py -c /usr/src/watcher.ini start
 
 python login.py
-python manage.py account &
-python manage.py tag &
+nohup python manage.py account > /dev/null 2>&1 &
+nohup python manage.py tag > /dev/null 2>&1 &
 
 exec "$@"
