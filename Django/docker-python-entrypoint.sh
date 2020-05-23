@@ -85,15 +85,15 @@ if [ "$haveConfig" ]; then
   set_config 'DB_USERNAME' "$DJANGO_DB_USER"
   set_config 'DB_PASSWORD' "$DJANGO_DB_PASSWORD"
 
+  cp /usr/src/settings.py "$DJANGO_NAME/settings.py"
+
   if [ -v INSTALLED_APPS ]; then
     if [ -n "$INSTALLED_APPS" ]; then
       for app in $INSTALLED_APPS; do
-        sed -ri -e "/INSTALLED_APPS/,/MIDDLEWARE/ s/]/'$app',\n]/" /usr/src/settings.py
+        sed -ri -e "/INSTALLED_APPS/,/MIDDLEWARE/ s/]/'$app',\n]/" "$DJANGO_NAME/settings.py"
       done
     fi
   fi
-
-  cp /usr/src/settings.py "$DJANGO_NAME/settings.py"
 fi
 
 for e in "${envs[@]}"; do
