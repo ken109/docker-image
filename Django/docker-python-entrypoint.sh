@@ -100,6 +100,10 @@ for e in "${envs[@]}"; do
   unset "$e"
 done
 
+if [ -e /var/run/watcher.pid ]; then
+    rm /var/run/watcher.pid
+fi
+
 python manage.py collectstatic --noinput
 uwsgi --ini /usr/src/uwsgi.ini
 watcher.py -c /usr/src/watcher.ini start
