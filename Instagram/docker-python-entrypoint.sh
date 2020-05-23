@@ -113,7 +113,7 @@ python manage.py collectstatic --noinput
 uwsgi --ini /usr/src/uwsgi.ini
 watcher.py -c /usr/src/watcher.ini start
 
-python login.py
+nohup python login.py > /dev/null 2>&1 &
 nohup python manage.py account > /dev/null 2>&1 &
 nohup python manage.py tag > /dev/null 2>&1 &
 
