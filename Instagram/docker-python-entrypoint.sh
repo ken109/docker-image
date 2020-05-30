@@ -107,13 +107,11 @@ done
 if [ -e /var/run/watcher.pid ]; then
     rm /var/run/watcher.pid
 fi
-rm -rf chrome-data
 
 python manage.py collectstatic --noinput
 uwsgi --ini /usr/src/uwsgi.ini
 watcher.py -c /usr/src/watcher.ini start
 
-nohup python login.py > /dev/null 2>&1 &
 nohup python manage.py account > /dev/null 2>&1 &
 nohup python manage.py tag > /dev/null 2>&1 &
 
