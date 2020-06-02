@@ -1,7 +1,7 @@
 FROM python:slim as builder
 
 WORKDIR /usr/src/app
-COPY . .
+COPY requirements.txt requirements.txt
 
 RUN set -eux; \
 	apt-get update; \
@@ -9,12 +9,17 @@ RUN set -eux; \
 		build-essential \
 	; \
 	rm -rf /var/lib/apt/lists/*; \
-	pip install --no-cache-dir -r requirements.txt
+	pip install --no-cache-dir -r requirements.txt; \
+	pip list -o | tail -n +3 | awk '{ print $1 }' | xargs pip install -U
 
 FROM python:slim
 
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/lib /usr/local/lib
+
+COPY watcher.ini /usr/src
+COPY watcher.py /usr/local/bin
+COPY refresh.sh /usr/local/bin
 
 WORKDIR /usr/src/app
 COPY main.py main.py

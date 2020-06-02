@@ -1,3 +1,4 @@
+import os
 import sys
 from twisted.internet import reactor, defer
 from twisted.names import client, dns, error, server
@@ -45,7 +46,7 @@ class DynamicResolver(object):
 
 def main():
     local_domains = []
-    with open('hosts.txt', 'r') as f:
+    with open('/usr/src/app/hosts.txt', 'r') as f:
         for line in f:
             host = line.split()
             if host[0][0] == '/' and host[0][-1] == '/':
@@ -70,5 +71,20 @@ def main():
     reactor.run()
 
 
+def write_pid(pidfile):
+    if not pidfile:
+        return False
+    pid = os.getpid()
+    fp = open(pidfile, 'w')
+    try:
+        fp.write(str(pid))
+        return True
+    finally:
+        fp.close()
+
+
 if __name__ == '__main__':
-    raise SystemExit(main())
+    if write_pid('/var/run/dns.pid') is True:
+        raise SystemExit(main())
+    else:
+        sys.exit(2)
