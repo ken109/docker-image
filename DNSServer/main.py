@@ -14,7 +14,7 @@ class DynamicResolver(object):
         self.local_domains = local_domains
         self.hosts = []
 
-    def _dynamicResponseRequired(self, query):
+    def _dynamic_response_required(self, query):
         name = query.name.name.decode()
         if query.type == dns.A:
             self.hosts = [domain[0].search(name) for domain in self.local_domains]
@@ -26,7 +26,7 @@ class DynamicResolver(object):
             self.log.debug(f'Non type A address: {name}')
         return False
 
-    def _doDynamicResponse(self, query):
+    def _do_dynamic_response(self, query):
         name = query.name.name.decode()
         answer = dns.RRHeader(
             name=name,
@@ -38,8 +38,8 @@ class DynamicResolver(object):
         return answers, authority, additional
 
     def query(self, query, timeout=None):
-        if self._dynamicResponseRequired(query):
-            return defer.succeed(self._doDynamicResponse(query))
+        if self._dynamic_response_required(query):
+            return defer.succeed(self._do_dynamic_response(query))
         else:
             return defer.fail(error.DomainError())
 
