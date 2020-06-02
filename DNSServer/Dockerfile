@@ -18,7 +18,9 @@ COPY --from=builder /usr/local/lib /usr/local/lib
 
 WORKDIR /usr/src/app
 COPY main.py main.py
+COPY docker-entrypoint.sh docker-entrypoint.sh
 
 EXPOSE 53
 
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD [ "python", "./main.py" ]

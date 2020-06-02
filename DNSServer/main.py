@@ -9,10 +9,13 @@ import re
 class DynamicResolver(object):
     log = Logger()
 
+    def __init__(self, local_domains):
+        self.local_domains = local_domains
+
     def _dynamicResponseRequired(self, query):
         name = query.name.name.decode()
         if query.type == dns.A:
-            if re.search(r'^[^.]*$', name) or re.search(r'\.localhost$', name):
+            if any((domain.search(name) for domain in self.local_domains)):
                 self.log.debug(f'Localhost address: {name}')
                 return True
             self.log.debug(f'Other host address: {name}')
@@ -38,10 +41,15 @@ class DynamicResolver(object):
 
 
 def main():
+    local_domains = []
+    with open('domains.txt', 'r') as f:
+        for line in f:
+            local_domains.append(re.compile(line.replace('\n', '')))
+
     log.startLogging(sys.stdout)
 
     factory = server.DNSServerFactory(
-        clients=[DynamicResolver(), client.Resolver(servers=[('8.8.8.8', 53), ('8.8.4.4', 53)])]
+        clients=[DynamicResolver(local_domains), client.Resolver(servers=[('8.8.8.8', 53), ('8.8.4.4', 53)])]
     )
 
     protocol = dns.DNSDatagramProtocol(controller=factory)
