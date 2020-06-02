@@ -11,11 +11,13 @@ class DynamicResolver(object):
 
     def __init__(self, local_domains):
         self.local_domains = local_domains
+        self.hosts = []
 
     def _dynamicResponseRequired(self, query):
         name = query.name.name.decode()
         if query.type == dns.A:
-            if any((domain.search(name) for domain in self.local_domains)):
+            self.hosts = [domain[0].search(name) for domain in self.local_domains]
+            if any(self.hosts):
                 self.log.debug(f'Localhost address: {name}')
                 return True
             self.log.debug(f'Other host address: {name}')
@@ -27,7 +29,8 @@ class DynamicResolver(object):
         name = query.name.name.decode()
         answer = dns.RRHeader(
             name=name,
-            payload=dns.Record_A(address='127.0.0.1'))
+            payload=dns.Record_A(
+                address=self.local_domains[[i for i, x in enumerate(self.hosts) if x is not None][0]][1]))
         answers = [answer]
         authority = []
         additional = []
@@ -42,9 +45,16 @@ class DynamicResolver(object):
 
 def main():
     local_domains = []
-    with open('domains.txt', 'r') as f:
+    with open('hosts.txt', 'r') as f:
         for line in f:
-            local_domains.append(re.compile(line.replace('\n', '')))
+            host = line.split()
+            if host[0][0] == '/' and host[0][-1] == '/':
+                local_domains.append([re.compile(host[0][1:-1]), host[1]])
+            elif host[0][0] == '/' or host[0][-1] == '/':
+                exit(2)
+            else:
+                host[0] = host[0].replace('*', r'[0-9a-zA-Z\-_]*')
+                local_domains.append([re.compile(f'^{host[0]}$'), host[1]])
 
     log.startLogging(sys.stdout)
 
