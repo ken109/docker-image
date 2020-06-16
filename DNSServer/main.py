@@ -57,10 +57,15 @@ def main():
                 host[0] = host[0].replace('*', r'[0-9a-zA-Z\-_]*')
                 local_domains.append([re.compile(f'^{host[0]}$'), host[1]])
 
+    servers = []
+    with open('/usr/src/app/resolver.txt', 'r') as f:
+        for line in f:
+            servers.append((line.replace('\n', ''), 53))
+
     log.startLogging(sys.stdout)
 
     factory = server.DNSServerFactory(
-        clients=[DynamicResolver(local_domains), client.Resolver(servers=[('8.8.8.8', 53), ('8.8.4.4', 53)])]
+        clients=[DynamicResolver(local_domains), client.Resolver(servers=servers)]
     )
 
     protocol = dns.DNSDatagramProtocol(controller=factory)
