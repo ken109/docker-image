@@ -7,6 +7,7 @@ RUN set -eux; \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
 		unzip \
+        git \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
