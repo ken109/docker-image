@@ -17,7 +17,7 @@ jobs:
       run: docker push ken109/laravel:latest
   
   DNSServer:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Build
