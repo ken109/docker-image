@@ -1,4 +1,4 @@
-FROM python:slim as builder
+FROM python:3.7-slim as builder
 
 WORKDIR /usr/src/app
 COPY requirements.txt requirements.txt
@@ -12,7 +12,7 @@ RUN set -eux; \
 	pip install --no-cache-dir -r requirements.txt; \
 	pip list -o | tail -n +3 | awk '{ print $1 }' | xargs pip install -U
 
-FROM python:slim
+FROM python:3.7-slim
 
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/lib /usr/local/lib
