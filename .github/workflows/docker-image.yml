@@ -11,5 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Laravel image
       run: docker build ./Laravel --tag ken109/laravel:latest
+    - name: Login Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
     - name: Push the Laravel image
       run: docker push ken109/laravel:latest
