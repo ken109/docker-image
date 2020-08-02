@@ -1,0 +1,14 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  laravel:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build the Laravel image
+      run: docker build ./Laravel --tag ken109/laravel:latest
+    - name: Push the Laravel image
+      run: docker push ken109/laravel:latest
