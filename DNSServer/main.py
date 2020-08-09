@@ -27,11 +27,18 @@ class DynamicResolver(object):
         return False
 
     def _do_dynamic_response(self, query):
+        def get_address(domain):
+            match = re.search('-([0-9]{1,3})-([0-9]{1,3})$', domain)
+            if match:
+                group = match.groups()
+                return f'192.168.{group[0]}.{group[1]}'
+            return self.local_domains[[i for i, x in enumerate(self.hosts) if x is not None][0]][1]
+
         name = query.name.name.decode()
         answer = dns.RRHeader(
             name=name,
             payload=dns.Record_A(
-                address=self.local_domains[[i for i, x in enumerate(self.hosts) if x is not None][0]][1]))
+                address=get_address(name)))
         answers = [answer]
         authority = []
         additional = []
