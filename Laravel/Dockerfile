@@ -5,10 +5,17 @@ RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 # Ghostscript is required for rendering PDF previews
+        curl \
+        gnupg \
 		ghostscript \
 		unzip \
         git \
 	; \
+    curl -sL https://deb.nodesource.com/setup_14.x | bash - ;\
+    apt-get install -y --no-install-recommends \
+        nodejs \
+    ; \
+        npm install npm@latest -g ;\
 	rm -rf /var/lib/apt/lists/*
 
 RUN set -ex; \
