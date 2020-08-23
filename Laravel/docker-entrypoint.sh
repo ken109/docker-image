@@ -136,8 +136,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 fi
             fi
         fi
-
-        chown -R www-data:www-data .
     fi
 
     # now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
@@ -145,6 +143,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         unset "$e"
     done
 fi
+
+chown -R www-data:www-data .
 
 cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
