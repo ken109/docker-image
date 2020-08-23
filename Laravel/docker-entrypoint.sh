@@ -137,7 +137,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             fi
         fi
 
-        chmod -R 777 storage/*
+        chown -R www-data:www-data .
     fi
 
     # now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
