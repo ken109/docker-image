@@ -72,6 +72,11 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         composer install
     fi
 
+    if [ ! -e .env ]; then
+        cp .env.example .env
+        chown "$user:$group" .env
+    fi
+
     echo yes | php artisan key:gen
 
     if [ -v DO_MIGRATE ]; then
@@ -80,11 +85,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
                 echo yes | php artisan migrate
             fi
         fi
-    fi
-
-    if [ ! -e .env ]; then
-        cp .env.example .env
-        chown "$user:$group" .env
     fi
 
     # allow any of these "Authentication Unique Keys and Salts." to be specified via
