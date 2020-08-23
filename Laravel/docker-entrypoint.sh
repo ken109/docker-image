@@ -72,6 +72,21 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         composer install
     fi
 
+    echo yes | php artisan key:gen
+
+    if [ -v DO_MIGRATE ]; then
+        if [ -n "$DO_MIGRATE" ]; then
+            if [ "$DO_MIGRATE" != "false" ]; then
+                echo yes | php artisan migrate
+            fi
+        fi
+    fi
+
+    if [ ! -e .env ]; then
+        cp .env.example .env
+        chown "$user:$group" .env
+    fi
+
     # allow any of these "Authentication Unique Keys and Salts." to be specified via
     # environment variables with a "LARAVEL_" prefix (ie, "LARAVEL_AUTH_KEY")
     envs=(
@@ -112,11 +127,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         : "${LARAVEL_DB_PASSWORD:=}"
         : "${LARAVEL_DB_NAME:=laravel}"
 
-        if [ ! -e .env ]; then
-            cp .env.example .env
-            chown "$user:$group" .env
-        fi
-
         set_config() {
             sed -ri -e "s/^$1.*/$1=$2/" .env
         }
@@ -127,33 +137,24 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         set_config 'DB_DATABASE' "$LARAVEL_DB_NAME"
         set_config 'DB_USERNAME' "$LARAVEL_DB_USER"
         set_config 'DB_PASSWORD' "$LARAVEL_DB_PASSWORD"
-
-        echo yes | php artisan key:gen
-        if [ -v DO_MIGRATE ]; then
-            if [ -n "$DO_MIGRATE" ]; then
-                if [ "$DO_MIGRATE" != "false" ]; then
-                    echo yes | php artisan migrate
-                fi
-            fi
-        fi
     fi
 
     # now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
     for e in "${envs[@]}"; do
         unset "$e"
     done
+
+    chown -R www-data:www-data .
+
+    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+
+    set_php() {
+        sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini
+    }
+
+    set_php 'memory_limit' '5G'
+    set_php 'post_max_size' '5G'
+    set_php 'upload_max_filesize' '5G'
 fi
-
-chown -R www-data:www-data .
-
-cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-
-set_php() {
-    sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini
-}
-
-set_php 'memory_limit' '5G'
-set_php 'post_max_size' '5G'
-set_php 'upload_max_filesize' '5G'
 
 exec "$@"
