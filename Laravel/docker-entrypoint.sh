@@ -150,7 +150,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
     if [ -v LARAVEL_DO_MIGRATION ]; then
         if [ "$LARAVEL_DO_MIGRATION" = "true" ]; then
-            php artisan migrate
+            echo yes | php artisan migrate
         fi
     fi
 
