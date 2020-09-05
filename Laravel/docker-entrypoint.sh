@@ -148,8 +148,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
     cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
-    if [ -v DO_MIGRATION ]; then
-        if [ "$DO_MIGRATION" ]; then
+    if [ -v LARAVEL_DO_MIGRATION ]; then
+        if [ "$LARAVEL_DO_MIGRATION" = "true" ]; then
             php artisan migrate
         fi
     fi
