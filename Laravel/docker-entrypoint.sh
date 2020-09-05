@@ -148,6 +148,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
     cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
+    if [ -v DO_MIGRATION ]; then
+        if [ "$DO_MIGRATION" ]; then
+            php artisan migrate
+        fi
+    fi
+
     set_php() {
         sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini
     }
