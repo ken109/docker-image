@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: DNS Server CI
 
 on:
   push:
