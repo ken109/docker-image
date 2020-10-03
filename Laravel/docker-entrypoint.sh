@@ -144,8 +144,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         unset "$e"
     done
 
-    if [ -v LARAVEL_DO_CHOWN ]; then
-        if [ "$LARAVEL_DO_CHOWN" = "true" ]; then
+    if [ -v LARAVEL_DONT_CHOWN ]; then
+        if [ ! "$LARAVEL_DONT_CHOWN" = "true" ]; then
             chown -R www-data:www-data .
         fi
     fi
