@@ -160,6 +160,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         fi
     fi
 
+    npm install && npm run production
+
     set_php() {
         sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini
     }
