@@ -148,6 +148,8 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         if [ ! "$LARAVEL_DONT_CHOWN" = "true" ]; then
             chown -R www-data:www-data .
         fi
+    else
+       chown -R www-data:www-data .
     fi
 
     cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
