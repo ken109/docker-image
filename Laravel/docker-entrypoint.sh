@@ -72,6 +72,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
         composer install
     fi
 
+    if [ ! -e package-lock.json ]; then
+        npm install && npm run production
+    fi
+
     if [ ! -e .env ]; then
         cp .env.example .env
         chown "$user:$group" .env
@@ -159,8 +163,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
             echo yes | php artisan migrate
         fi
     fi
-
-    npm install && npm run production
 
     set_php() {
         sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini
