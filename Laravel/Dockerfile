@@ -110,8 +110,6 @@ RUN composer global require laravel/installer; \
     chown -R www-data:www-data /usr/src/laravel; \
     rm -rf /root/.composer/cache/*
 
-VOLUME /var/www/html
-
 COPY docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]

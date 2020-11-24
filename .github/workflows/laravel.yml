@@ -6,9 +6,6 @@ on:
     paths:
       - "Laravel/**"
 
-  schedule:
-    - cron: '0 0 */5 * *'
-
 jobs:
   Laravel:
     runs-on: ubuntu-latest

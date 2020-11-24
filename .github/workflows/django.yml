@@ -6,9 +6,6 @@ on:
     paths:
       - "Django/**"
 
-  schedule:
-    - cron: '0 0 */5 * *'
-
 jobs:
   Django:
     runs-on: ubuntu-latest

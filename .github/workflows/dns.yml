@@ -6,9 +6,6 @@ on:
     paths:
       - "DNSServer/**"
 
-  schedule:
-    - cron: '0 0 */5 * *'
-
 jobs:
   DNSServer:
     runs-on: ubuntu-latest
