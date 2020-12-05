@@ -57,12 +57,20 @@ def main():
         for line in f:
             host = line.split()
             if host[0][0] == '/' and host[0][-1] == '/':
-                local_domains.append([re.compile(host[0][1:-1]), host[1]])
+                try:
+                    local_domains.append([re.compile(host[0][1:-1]), host[1]])
+                except IndexError:
+                    print(f'Index Error: {host}')
+                    exit(1)
             elif host[0][0] == '/' or host[0][-1] == '/':
                 exit(2)
             else:
                 host[0] = host[0].replace('*', r'[0-9a-zA-Z\-_]*')
-                local_domains.append([re.compile(f'^{host[0]}$'), host[1]])
+                try:
+                    local_domains.append([re.compile(f'^{host[0]}$'), host[1]])
+                except IndexError:
+                    print(f'Index Error: {host}')
+                    exit(1)
 
     servers = []
     with open('/usr/src/app/resolver.txt', 'r') as f:
