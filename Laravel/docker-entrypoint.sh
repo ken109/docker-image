@@ -156,21 +156,13 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
        chown -R www-data:www-data .
     fi
 
-    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-
     if [ -v LARAVEL_DO_MIGRATION ]; then
         if [ "$LARAVEL_DO_MIGRATION" = "true" ]; then
             echo yes | php artisan migrate
         fi
     fi
-
-    set_php() {
-        sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini
-    }
-
-    set_php 'memory_limit' '5G'
-    set_php 'post_max_size' '5G'
-    set_php 'upload_max_filesize' '5G'
 fi
+
+service supervisor start
 
 exec "$@"

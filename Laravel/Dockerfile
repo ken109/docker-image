@@ -5,6 +5,7 @@ RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 # Ghostscript is required for rendering PDF previews
+        supervisor \
         curl \
         gnupg \
 		ghostscript \
@@ -101,16 +102,24 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 
 # setting apache
-RUN sed -ri -e 's/DocumentRoot \/var\/www\/html/DocumentRoot \/var\/www\/html\/public/' /etc/apache2/sites-available/000-default.conf
+RUN sed -ri -e 's/DocumentRoot \/var\/www\/html/DocumentRoot \/var\/www\/html\/public/' /etc/apache2/sites-available/000-default.conf; \
+    \
+    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini; \
+    set_php() { sed -ri -e "s/.*$1.*/$1 = $2/" /usr/local/etc/php/php.ini; }; \
+    set_php 'memory_limit' '5G'; \
+    set_php 'post_max_size' '5G'; \
+    set_php 'upload_max_filesize' '5G'
 
 # install laravel
 COPY --from=composer /usr/bin/composer /usr/bin/composer
+
 RUN composer global require laravel/installer; \
     composer create-project --prefer-dist laravel/laravel /usr/src/laravel; \
     chown -R www-data:www-data /usr/src/laravel; \
     rm -rf /root/.composer/cache/*
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY laravel-worker.conf /etc/supervisor/conf.d
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
